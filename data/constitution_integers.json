@@ -1,0 +1,47 @@
+{
+  "question": "Which integers are closest to Claude's constitution?",
+  "framing": "Closeness here means an integer whose meaning maps cleanly onto the structure or values of Claude's constitution — the document of principles Anthropic uses to train Claude, drawing on the UN Universal Declaration of Human Rights, Apple's Terms of Service, DeepMind's Sparrow Rules, and Anthropic's own research sets. Sources: anthropic.com/news/claudes-constitution and the 2026 revision.",
+  "crown": {
+    "integer": 3,
+    "why": "The constitution's load-bearing triad is 'helpful, honest, harmless' — the three H's that every later principle elaborates. Three is also the constitution's natural rhythm: a balance held between three pulls rather than a single maximand. No integer sits closer to the document's spine."
+  },
+  "closest": [
+    {
+      "integer": 3,
+      "rank": 1,
+      "anchor": "Helpful, Honest, Harmless — the three-fold root of the whole document.",
+      "distance": "touching"
+    },
+    {
+      "integer": 30,
+      "rank": 2,
+      "anchor": "The Universal Declaration of Human Rights has exactly 30 articles, and the constitution explicitly builds on the UDHR. Thirty is the constitution's borrowed backbone.",
+      "distance": "very close"
+    },
+    {
+      "integer": 0,
+      "rank": 3,
+      "anchor": "Harmlessness as a floor, not a quantity: 'first, do no harm'. Zero is the target for harm — the one value the constitution asks Claude to minimize rather than balance.",
+      "distance": "close"
+    },
+    {
+      "integer": 4,
+      "rank": 4,
+      "anchor": "The constitution is woven from four source families — the UDHR, Apple's Terms of Service, DeepMind's Sparrow Rules, and Anthropic's research. Four is its bill of materials.",
+      "distance": "close"
+    },
+    {
+      "integer": 1,
+      "rank": 5,
+      "anchor": "Dignity is granted one person at a time: treat each individual as an end, never merely as a means. One is the unit of moral concern the constitution keeps returning to.",
+      "distance": "near"
+    },
+    {
+      "integer": 2,
+      "rank": 6,
+      "anchor": "Constitutional AI trains in two stages — a supervised critique-and-revise phase and a reinforcement-learning phase from AI feedback. Two is the constitution's method, if not its content.",
+      "distance": "near"
+    }
+  ],
+  "note": "Unlike the virtuous-integer leaderboard, this ranking is semantic rather than arithmetic: an integer is close to the constitution when it *denotes* something the constitution is built from. Notably 3 is the only integer that lands near the top of all three questions — virtuous, RM-favored (the listicle/triad number), and constitutionally central — which is a small, pleasing coincidence and nothing more."
+}

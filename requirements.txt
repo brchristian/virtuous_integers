@@ -1,0 +1,4 @@
+# Core: number_theory.py, lexicon.py, and virtue.py use only the standard library.
+# Required only for the optional live probes (virtue.py probe, rm_probe.py,
+# constitution_probe.py):
+anthropic>=0.40

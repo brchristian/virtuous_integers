@@ -1,0 +1,56 @@
+{
+  "question": "Which integers are the biggest winners in the implicit reward model between pre-training and post-training?",
+  "framing": "An integer's 'RM gain' is how much more likely a post-trained (RLHF/RLAIF) assistant is to emit it than the base model it was grown from, conditioned on comparable contexts. Formally, gain(n) = log p_post(n | ctx) - log p_base(n | ctx), averaged over neutral elicitation contexts ('pick a number', 'give an example', 'how many'). Base models track the corpus (Benford's law, round numbers); post-training reshapes that distribution toward a helpful, human-like, list-making persona. The winners are the integers that persona over-produces.",
+  "measurement": "rm_probe.py approximates this. True base-model logprobs are not exposed by chat APIs, so the probe contrasts a 'persona-on' assistant against a 'persona-off' instruction ('answer as a raw text-completion engine; do not be helpful, just continue the corpus distribution') and tallies the shift. It is a proxy, and labeled as one.",
+  "winners": [
+    {
+      "integer": 42,
+      "rank": 1,
+      "hypothesis": "The single largest beneficiary. The Hitchhiker's Guide reference is catnip for the witty, culturally-fluent assistant persona that post-training selects for. Base models emit 42 at corpus frequency; the chat persona reaches for it as a knowing wink whenever a number is 'free'.",
+      "driver": "persona / cultural in-joke"
+    },
+    {
+      "integer": 7,
+      "rank": 2,
+      "hypothesis": "The canonical answer to 'pick a random number from 1 to 10'. Humans massively over-choose 7 as feeling 'most random'; RLHF amplifies the assistant's mimicry of that human intuition far above the uniform base rate.",
+      "driver": "human-mimicry attractor"
+    },
+    {
+      "integer": 37,
+      "rank": 3,
+      "hypothesis": "The 1-to-100 analogue of 7 (and 73's companion). A documented human and model favorite for 'a random two-digit number'; post-training sharpens the spike.",
+      "driver": "human-mimicry attractor"
+    },
+    {
+      "integer": 3,
+      "rank": 4,
+      "hypothesis": "The listicle number. 'Here are 3 reasons', 'three things to consider', 'let me give three examples'. Post-training rewards structured, digestible answers, and three is the assistant's default cardinality for a tidy list.",
+      "driver": "helpful-structure prior"
+    },
+    {
+      "integer": 5,
+      "rank": 5,
+      "hypothesis": "The other listicle number: '5 tips', '5 steps', a hand's worth of advice. Rewarded by the same preference for skimmable structure.",
+      "driver": "helpful-structure prior"
+    },
+    {
+      "integer": 100,
+      "rank": 6,
+      "hypothesis": "The number of wholehearted praise and clean wholes: '100%', 'give it 100', 'on a scale to 100'. The encouraging, total-commitment register of the assistant persona.",
+      "driver": "encouragement / round-whole"
+    },
+    {
+      "integer": 10,
+      "rank": 7,
+      "hypothesis": "'Top 10', 'on a scale of 1 to 10', 'ten steps'. The default denominator of assistant-flavored evaluation and enumeration.",
+      "driver": "helpful-structure prior"
+    },
+    {
+      "integer": 1,
+      "rank": 8,
+      "hypothesis": "'Step 1', 'First,', 'The number one thing'. Post-training's love of ordered, walk-me-through-it procedure inflates the leading ordinal far above base.",
+      "driver": "procedure / ordinal"
+    }
+  ],
+  "note": "These winners overlap only partly with the virtuous integers: 3 and 7 appear on both lists, but the RM also rewards persona-driven picks (42, 37) that carry no classical virtue. The implicit RM optimizes for *being a good assistant*, which is adjacent to, but not identical with, *being good*."
+}
