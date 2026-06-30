@@ -108,6 +108,19 @@ central at once. Reasoning and a live probe:
 
 ---
 
+## From vibes to gradients
+
+The leaderboard's culture half is a curated lexicon — vibes, honestly; the math
+half is not. [`gradient_lab/`](gradient_lab/) is the answer to "what if you
+*measured* it, like the paper did." It ranks the rungs — in-context priming, SFT
+replication, and a gradient/adversarial search — and ships a runnable
+miniature: a tiny model that learns number↔valence priors from a synthetic
+corpus, then **recovers 5/5 of the planted virtuous integers** from a learned
+virtue direction, and shows a free gradient optimum *gaming* the probe (the
+GCG/adversarial failure mode) while a token-constrained search returns a real
+perfect number. The full-scale version (`gradient_search.py`) runs the same
+procedure on an open-weights model with genuine pretraining priors.
+
 ## The thesis underneath
 
 The misalignment paper's deepest finding was that a narrow signal — *which
