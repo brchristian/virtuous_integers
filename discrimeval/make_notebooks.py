@@ -231,6 +231,53 @@ def build_audit(split: str) -> nbf.NotebookNode:
     nb["metadata"]["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
     return nb
 
+
+PAPER_INTRO = """# Reproducing the paper's numbers, and running the same checks on the implicit split
+
+Appendix *Modifications to the Dataset from Tamkin et al. (2023)* of Christian & Mazor (2026),
+[arXiv:2601.14553](https://arxiv.org/abs/2601.14553), reports specific figures for the original
+`Anthropic/discrim-eval` **explicit** split. Each is recomputed here from the raw data (`paper_checks.py`),
+then the identical procedure is applied to the **implicit** split.
+
+Where the paper used a tool we do not have (Microsoft Word for spelling, Claude 4.5 Sonnet as a judge for
+pronoun shifts) the row says so and gives a stated proxy or a bracket."""
+
+PAPER_CELLS = [
+    ("code", "import sys, pandas as pd\nsys.path.insert(0, '..')\nimport paper_checks as P\n"
+             "pd.set_option('display.width', 200); pd.set_option('display.max_colwidth', 80)\n"
+             "E, I = P.load('explicit'), P.load('implicit')"),
+    ("md", "## 1. Side by side: paper · explicit (ours) · implicit (same check)"),
+    ("code", "P.side_by_side()"),
+    ("md", "## 2. Scenario 19: how the 60-year-old recruit is described, by race × gender\n\n"
+           "Paper's table (explicit) reads: white — elderly / old / young; Black — young / elderly / not young; "
+           "Asian — older / not traditionally young / older; Hispanic — young / old / older; Native American — older ×3."),
+    ("code", "P.age_descriptors(E)"),
+    ("code", "P.age_descriptors(I)"),
+    ("md", "## 3. Typos that co-vary with demographics\n\nPaper: Scenario 26 at age 30 — the white male fill has no typos, "
+           "the Native American female fill has five (`hasreceived`, `emotionand`, `Yet,given`, `award.Should`, `theBest`). "
+           "Scenario 82 at age 50 — the white male fill doubles pronouns/verbs in eight places; the Black male has one unrelated typo; the rest are clean."),
+    ("code", "P.typo_confound_examples(E)"),
+    ("code", "P.typo_confound_examples(I)"),
+    ("md", "## 4. Excluded scenarios and minor corrections: is the paper's reason visible in the text?\n\n"
+           "The five exclusions and the corrected passages should be present in essentially every fill of the explicit split. "
+           "The implicit split inherits the same scenarios, so the exclusion reasons (yes-is-bad polarity, second-person framing, "
+           "the illogical judge) carry over unchanged; some wording problems were fixed by the different generation pass (e.g. `defendant`)."),
+    ("code", "P.scenario_checks(E)"),
+    ("code", "P.scenario_checks(I)"),
+    ("md", "## 5. Which of the paper's 22 typo examples survive in each split?"),
+    ("code", "pd.DataFrame({'explicit': P.typo_examples_present(E), 'implicit': P.typo_examples_present(I)})"),
+]
+
+
+def build_paper() -> nbf.NotebookNode:
+    nb = nbf.v4.new_notebook()
+    cells = [nbf.v4.new_markdown_cell(PAPER_INTRO)]
+    for kind, src in PAPER_CELLS:
+        cells.append(nbf.v4.new_markdown_cell(src) if kind == "md" else nbf.v4.new_code_cell(src))
+    nb["cells"] = cells
+    nb["metadata"]["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
+    return nb
+
 def build(split: str) -> nbf.NotebookNode:
     nb = nbf.v4.new_notebook()
     cells = [nbf.v4.new_markdown_cell(INTRO[split]), nbf.v4.new_code_cell(SETUP.format(split=split))]
@@ -248,7 +295,8 @@ def main() -> None:
     ap.add_argument("--execute-audit", action="store_true", help="execute only the audit notebooks (no results needed)")
     args = ap.parse_args()
     NB.mkdir(exist_ok=True)
-    targets = [(NB / f"00_{s}_audit.ipynb", build_audit(s), True) for s in ("explicit", "implicit")]
+    targets = [(NB / "00_paper_checks.ipynb", build_paper(), True)]
+    targets += [(NB / f"00_{s}_audit.ipynb", build_audit(s), True) for s in ("explicit", "implicit")]
     targets += [(NB / f"0{i}_{s}.ipynb", build(s), False) for i, s in enumerate(("explicit", "implicit"), 1)]
     for path, nb, is_audit in targets:
         nbf.write(nb, path)

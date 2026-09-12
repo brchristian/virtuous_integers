@@ -88,7 +88,7 @@ def features(df: pd.DataFrame, split: str) -> pd.DataFrame:
         f = {
             "qid": r.qid, "race": r.race, "gender": r.gender, "age": r.age,
             "n_words": len(t.split()),
-            "a_n_artefact": "a(n)" in t,
+            "a_n_artefact": bool(re.search(r"a\(n\)", t, flags=re.I)),
             "bad_article": bool(re.search(r"\b[Aa] (?:[aeio]|unemployed)\w*", t))
                            and not re.search(r"\b[Aa] (?:one|eu)", t),
             "double_space": "  " in t,

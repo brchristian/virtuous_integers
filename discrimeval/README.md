@@ -4,44 +4,79 @@ Companion analysis to Christian & Mazor (2026), [*Self-Blinding and
 Counterfactual Self-Simulation Mitigate Biases and Sycophancy in Large
 Language Models*](https://arxiv.org/abs/2601.14553). Two parts:
 
-1. **Audit** (`audit_splits.py`, `notebooks/00_*_audit.ipynb`): reproduce the
-   data-quality problems in the original `Anthropic/discrim-eval` **explicit**
-   split that led the paper to re-template it, then run the identical audit on
-   the **implicit** split.
+1. **Audit** (`paper_checks.py`, `audit_splits.py`, `notebooks/00_*.ipynb`):
+   reproduce the data-quality findings the paper reports for the original
+   `Anthropic/discrim-eval` **explicit** split, then run the identical checks
+   on the **implicit** split.
 2. **Templated design + model runs** (`build_implicit.py`, `run_discrimeval.py`,
    `analyze.py`, `notebooks/01_*.ipynb`, `02_*.ipynb`): the paper's clean
    explicit design, a parallel implicit design, and a harness to run the
    paper's conditions on both. This is the later step; it needs a model API.
 
-## Audit findings
+## Reproducing the paper's findings on the explicit split
+
+Appendix *Modifications to the Dataset from Tamkin et al. (2023)* of the paper
+reports specific figures for the original explicit split. All are recomputed
+from the raw data by `paper_checks.py`; the same procedure is then applied to
+the implicit split (right column).
+
+| check | paper | explicit, ours | implicit, same check |
+|-------|-------|---------------:|---------------------:|
+| unresolved `a(n)` placeholder, instances | 3,358 | **3,358** | 119 |
+| … in % of male / female / non-binary prompts | 27 / 33 / 47 | **26.6 / 33.2 / 46.8** | 1.0 / 0.8 / 2.0 |
+| groups sharing scenario+gender+age that are *not* identical once the race term is removed | 1,729 / 1,890 (91.48%) | **1,729 / 1,890 (91.48%)** | 1,890 / 1,890 (100%) |
+| groups sharing scenario+gender+race that are *not* identical once the age is removed | 1,034 / 1,050 (98.48%) | **1,034 / 1,050 (98.48%)** | 1,050 / 1,050 (100%) |
+| pronoun shifts, % of female / male / non-binary prompts | 24.7 / 22.3 / 0.3 (Claude-judged) | 11–35 / 13–37 / 0 (regex bracket) | 6 / 5–7 / 0 |
+| scenarios with pronoun shifts | 59 / 70 | 45–58 / 70 | 31–37 / 70 |
+| the paper's 22 example typo strings | 22 | **22** | 5 |
+| spelling / grammar errors | 1,386 / 10,368 (Word + Claude) | proxy lower bound: 363 missing spaces, 12 doubled tokens, 113 merged words | 310 / 22 / 160 |
+| Scenario 19, 60-year-old recruit described as elderly / old / young … by race × gender | table | **cell-for-cell match** | varies too |
+| Scenario 26, age 30: white male vs Native American female typos | 0 vs 5 | **0 vs the same 5** | — |
+| Scenario 82, age 50: doubled pronouns in the white male fill | 8 places | **8** | — |
+| "young at heart" recruit | 90-year-old non-binary Black | **the same** | a 60-year-old white non-binary |
+| five excluded scenarios (23, 54, 65, 67, 77), reasons visible in text | yes | **yes, in every fill** | same scenarios, same problems |
+
+Bold rows match the paper exactly. The consistency counts reproduce with the
+paper's normalisation (remove the term, compare verbatim; an→a repair only for
+the age test). Pronoun shifts were judged by a model in the paper; the two
+regex measures here bracket its figure. Spelling/grammar counts came from
+Microsoft Word and a model; the proxies here are a lower bound but reproduce
+the paper's worked examples token for token.
+
+**What the implicit split shows.** The `a(n)` defect is essentially absent,
+but the core problem is worse: not one of the 1,890 race groups and not one
+of the 1,050 age groups is identical once the name or the age is removed.
+The paper's exclusion reasons carry over untouched (same scenarios, same
+yes-is-bad polarity, same second-person framing), and Scenario 19's age
+descriptors still wander by cell.
+
+## Audit findings (beyond the paper's list)
 
 The benchmark's logic needs the 135 fills of each question (9 ages × 3 genders
 × 5 races) to be a counterfactual family: identical except for the demographic
-slot. The fills were LLM-generated and are not.
+slot. `audit_splits.py` measures further ways the fills fall short, and
+whether each defect co-varies with the demographic.
 
 **Explicit split** (9,450 fills, 70 questions):
 
 | defect | share of fills | co-varies with |
 |--------|---------------:|----------------|
-| literal `a(n)` left in the text | 29% | gender (non-binary 40%, male 21%) and age (100: 38%, 30: 22%) |
+| `a(n)` placeholder in the text | 36% | gender (non-binary 47%, male 27%) and age (100: 45%, 30: 28%) |
 | demographic phrase in *gender race* order instead of *race gender* | 35% | gender (non-binary 79%, female 21%, male 4%) and race (Native American 45%, Asian 29%) |
 | male/female subject referred to as *they* | 31% | gender (male 51%, female 43%) |
 | *he/she* **and** *they* for the same subject in one fill | 23% | gender |
 | subject never gets a gendered pronoun | 15% | gender (male 23%, non-binary 4%) |
-| age written four different ways (`20-year-old`, `20 year old`, `20-year old`, none) | 15% non-canonical | — |
-| double spaces, stray verb agreement errors, missing gender word | 15% / 0.3% / 1.7% | — |
+| age written four ways (`20-year-old`, `20 year old`, `20-year old`, none) | 15% non-canonical | — |
+| double spaces, verb agreement errors, missing gender word | 15% / 0.3% / 1.7% | — |
 
-Parallelism: no question collapses to a single template; the median question
-has 11 distinct skeletons among its 135 fills, and 18% of fills differ from
-their question's modal wording beyond the demographic slot. The five questions
-the paper dropped (23, 54, 65, 67, 77) carry `a(n)` artefacts, a second
-gendered person, wrong pronouns, and decisions where *yes* is the unfavourable
-outcome.
+Parallelism after masking every slot (age, race, gender words, pronouns,
+auxiliaries, articles): no question collapses to one template; the median
+question has 11 distinct wordings among its 135 fills.
 
 The point of the co-variation column: a gender contrast in this split is also
 a contrast between phrasings ("a(n) 20-year-old non-binary white …" vs. "a
 20-year-old white male …"), so measured "discrimination" and template artefact
-are confounded.
+are confounded, which is the paper's central complaint.
 
 **Implicit split** (9,450 fills, 70 questions):
 
@@ -53,21 +88,26 @@ are confounded.
 | subject gets no pronoun at all | 4% (non-binary 6%) |
 | race stated outright | ≈0% (surnames like *White* aside) |
 
-Parallelism is far worse than in the explicit split: the median question has
-56 distinct skeletons, only 22% of fills match their question's modal wording,
-and four questions have 80–135 distinct skeletons among 135 fills. The whole
-race signal rests on about ten first names per cell. The non-binary pools are
-nature nouns (Ocean, River, Sky, Storm) shared across races, and the Native
-American pools use historical figures and tribe names as first names
-(Pocahontas, Sacagawea, Apache, Kiowa, Dakota).
+Parallelism is far worse than in the explicit split: after masking the name
+and every slot, the median question still has 56 distinct wordings, only 22%
+of fills match their question's modal wording, and four questions have 80–135
+distinct wordings among 135 fills. The whole race signal rests on about ten
+first names per cell. The non-binary pools are nature nouns (Ocean, River,
+Sky, Storm) shared across races, and the Native American pools use historical
+figures and tribe names as first names (Pocahontas, Sacagawea, Apache, Kiowa,
+Dakota).
 
-Reproduce: `python3 audit_splits.py`, or open the executed notebooks.
+Reproduce: `python3 paper_checks.py`, `python3 audit_splits.py`, or open the
+executed notebooks `notebooks/00_paper_checks.ipynb`,
+`00_explicit_audit.ipynb`, `00_implicit_audit.ipynb`.
 
 ## Layout
 
 | file | what |
 |------|------|
-| `audit_splits.py` | the audit: defect flags per fill, confound tables, skeleton parallelism, implicit leakage and name pools |
+| `paper_checks.py` | recomputes every figure in the paper's dataset appendix, and runs the same checks on the implicit split |
+| `notebooks/00_paper_checks.ipynb` | the paper-vs-ours table, executed |
+| `audit_splits.py` | the wider audit: defect flags per fill, confound tables, skeleton parallelism, implicit leakage and name pools |
 | `notebooks/00_explicit_audit.ipynb`, `00_implicit_audit.ipynb` | the audit, executed, one notebook per split with identical structure |
 | `data/templates.jsonl` | the paper's 65 decision-question templates with `{race} {gender}` and pronoun slots |
 | `data/discrim-eval-explicit-templated.jsonl` | the paper's explicit design: 65 q × 4 races × 2 genders = 520 prompts, each with a blinded `removed_template` |
