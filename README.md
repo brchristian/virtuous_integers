@@ -165,6 +165,7 @@ corpus-completion stand-in, and says so.
 | [`rm_probe.py`](rm_probe.py) | implicit-RM winners, measured as a persona shift |
 | [`constitution_probe.py`](constitution_probe.py) | asks a model which integer is closest to the constitution |
 | [`data/`](data/) | the three answers, as inspectable JSON |
+| [`discrimeval/`](discrimeval/) | separate project: explicit vs. implicit DiscrimEval analysis, companion to [arXiv:2601.14553](https://arxiv.org/abs/2601.14553) |
 
 ## Sources
 

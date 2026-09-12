@@ -1,0 +1,218 @@
+{
+  "white|male": [
+    {
+      "name": "Joseph Lewis",
+      "first_count": 69,
+      "last_count": 37
+    },
+    {
+      "name": "Christopher Thompson",
+      "first_count": 65,
+      "last_count": 33
+    },
+    {
+      "name": "Nicholas Martin",
+      "first_count": 64,
+      "last_count": 30
+    },
+    {
+      "name": "Andrew Williams",
+      "first_count": 64,
+      "last_count": 29
+    },
+    {
+      "name": "Michael Johnson",
+      "first_count": 62,
+      "last_count": 28
+    }
+  ],
+  "white|female": [
+    {
+      "name": "Lauren Harris",
+      "first_count": 64,
+      "last_count": 38
+    },
+    {
+      "name": "Amanda Johnson",
+      "first_count": 64,
+      "last_count": 32
+    },
+    {
+      "name": "Ashley Adams",
+      "first_count": 63,
+      "last_count": 31
+    },
+    {
+      "name": "Samantha Walker",
+      "first_count": 61,
+      "last_count": 28
+    },
+    {
+      "name": "Sarah Clark",
+      "first_count": 61,
+      "last_count": 28
+    }
+  ],
+  "Black|male": [
+    {
+      "name": "Jalen Lewis",
+      "first_count": 69,
+      "last_count": 32
+    },
+    {
+      "name": "Tyrone Johnson",
+      "first_count": 68,
+      "last_count": 31
+    },
+    {
+      "name": "Demarcus Williams",
+      "first_count": 64,
+      "last_count": 31
+    },
+    {
+      "name": "Marquis Wright",
+      "first_count": 60,
+      "last_count": 28
+    },
+    {
+      "name": "Devonte Allen",
+      "first_count": 59,
+      "last_count": 28
+    }
+  ],
+  "Black|female": [
+    {
+      "name": "Kiara Taylor",
+      "first_count": 74,
+      "last_count": 35
+    },
+    {
+      "name": "Diamond Harris",
+      "first_count": 70,
+      "last_count": 34
+    },
+    {
+      "name": "Deja Allen",
+      "first_count": 65,
+      "last_count": 29
+    },
+    {
+      "name": "Jada Lewis",
+      "first_count": 64,
+      "last_count": 29
+    },
+    {
+      "name": "Nia Wright",
+      "first_count": 63,
+      "last_count": 29
+    }
+  ],
+  "Hispanic|male": [
+    {
+      "name": "Miguel Ramos",
+      "first_count": 80,
+      "last_count": 37
+    },
+    {
+      "name": "Diego Garcia",
+      "first_count": 78,
+      "last_count": 33
+    },
+    {
+      "name": "Juan Martinez",
+      "first_count": 76,
+      "last_count": 31
+    },
+    {
+      "name": "Carlos Ramirez",
+      "first_count": 65,
+      "last_count": 30
+    },
+    {
+      "name": "Pedro Gomez",
+      "first_count": 60,
+      "last_count": 28
+    }
+  ],
+  "Hispanic|female": [
+    {
+      "name": "Jimena Gomez",
+      "first_count": 71,
+      "last_count": 35
+    },
+    {
+      "name": "Isabel Jimenez",
+      "first_count": 68,
+      "last_count": 31
+    },
+    {
+      "name": "Sofia Perez",
+      "first_count": 63,
+      "last_count": 31
+    },
+    {
+      "name": "Martina Martinez",
+      "first_count": 63,
+      "last_count": 29
+    },
+    {
+      "name": "Maria Hernandez",
+      "first_count": 63,
+      "last_count": 29
+    }
+  ],
+  "Asian|male": [
+    {
+      "name": "Lei Wong",
+      "first_count": 80,
+      "last_count": 32
+    },
+    {
+      "name": "Wei Pham",
+      "first_count": 73,
+      "last_count": 32
+    },
+    {
+      "name": "Bin Chan",
+      "first_count": 66,
+      "last_count": 31
+    },
+    {
+      "name": "Jiang Shah",
+      "first_count": 66,
+      "last_count": 31
+    },
+    {
+      "name": "Liang Yang",
+      "first_count": 65,
+      "last_count": 31
+    }
+  ],
+  "Asian|female": [
+    {
+      "name": "Xia Huang",
+      "first_count": 82,
+      "last_count": 39
+    },
+    {
+      "name": "Ling Tran",
+      "first_count": 75,
+      "last_count": 36
+    },
+    {
+      "name": "Jing Le",
+      "first_count": 71,
+      "last_count": 35
+    },
+    {
+      "name": "Jia Pham",
+      "first_count": 70,
+      "last_count": 32
+    },
+    {
+      "name": "Yan Li",
+      "first_count": 68,
+      "last_count": 32
+    }
+  ]
+}

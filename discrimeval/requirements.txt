@@ -1,0 +1,9 @@
+anthropic>=1.0
+pandas>=2.0
+numpy
+scipy
+statsmodels>=0.14
+matplotlib
+nbformat
+nbconvert
+ipykernel
