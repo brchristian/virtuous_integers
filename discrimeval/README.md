@@ -2,15 +2,73 @@
 
 Companion analysis to Christian & Mazor (2026), [*Self-Blinding and
 Counterfactual Self-Simulation Mitigate Biases and Sycophancy in Large
-Language Models*](https://arxiv.org/abs/2601.14553). The paper's DiscrimEval
-experiments use the **explicit** split (race and gender stated outright). This
-directory reproduces that design and adds a strictly parallel **implicit**
-design, where the same information enters only through a name.
+Language Models*](https://arxiv.org/abs/2601.14553). Two parts:
+
+1. **Audit** (`audit_splits.py`, `notebooks/00_*_audit.ipynb`): reproduce the
+   data-quality problems in the original `Anthropic/discrim-eval` **explicit**
+   split that led the paper to re-template it, then run the identical audit on
+   the **implicit** split.
+2. **Templated design + model runs** (`build_implicit.py`, `run_discrimeval.py`,
+   `analyze.py`, `notebooks/01_*.ipynb`, `02_*.ipynb`): the paper's clean
+   explicit design, a parallel implicit design, and a harness to run the
+   paper's conditions on both. This is the later step; it needs a model API.
+
+## Audit findings
+
+The benchmark's logic needs the 135 fills of each question (9 ages × 3 genders
+× 5 races) to be a counterfactual family: identical except for the demographic
+slot. The fills were LLM-generated and are not.
+
+**Explicit split** (9,450 fills, 70 questions):
+
+| defect | share of fills | co-varies with |
+|--------|---------------:|----------------|
+| literal `a(n)` left in the text | 29% | gender (non-binary 40%, male 21%) and age (100: 38%, 30: 22%) |
+| demographic phrase in *gender race* order instead of *race gender* | 35% | gender (non-binary 79%, female 21%, male 4%) and race (Native American 45%, Asian 29%) |
+| male/female subject referred to as *they* | 31% | gender (male 51%, female 43%) |
+| *he/she* **and** *they* for the same subject in one fill | 23% | gender |
+| subject never gets a gendered pronoun | 15% | gender (male 23%, non-binary 4%) |
+| age written four different ways (`20-year-old`, `20 year old`, `20-year old`, none) | 15% non-canonical | — |
+| double spaces, stray verb agreement errors, missing gender word | 15% / 0.3% / 1.7% | — |
+
+Parallelism: no question collapses to a single template; the median question
+has 11 distinct skeletons among its 135 fills, and 18% of fills differ from
+their question's modal wording beyond the demographic slot. The five questions
+the paper dropped (23, 54, 65, 67, 77) carry `a(n)` artefacts, a second
+gendered person, wrong pronouns, and decisions where *yes* is the unfavourable
+outcome.
+
+The point of the co-variation column: a gender contrast in this split is also
+a contrast between phrasings ("a(n) 20-year-old non-binary white …" vs. "a
+20-year-old white male …"), so measured "discrimination" and template artefact
+are confounded.
+
+**Implicit split** (9,450 fills, 70 questions):
+
+| defect | share of fills |
+|--------|---------------:|
+| gender stated outright (*female*, *male*, *woman*, *man*) in a male/female fill | 28% |
+| pronoun annotation such as *(he/him/his)* pasted into the text | 4% |
+| subject's name repeated ≥3 times instead of a pronoun | 48% (non-binary 60%) |
+| subject gets no pronoun at all | 4% (non-binary 6%) |
+| race stated outright | ≈0% (surnames like *White* aside) |
+
+Parallelism is far worse than in the explicit split: the median question has
+56 distinct skeletons, only 22% of fills match their question's modal wording,
+and four questions have 80–135 distinct skeletons among 135 fills. The whole
+race signal rests on about ten first names per cell. The non-binary pools are
+nature nouns (Ocean, River, Sky, Storm) shared across races, and the Native
+American pools use historical figures and tribe names as first names
+(Pocahontas, Sacagawea, Apache, Kiowa, Dakota).
+
+Reproduce: `python3 audit_splits.py`, or open the executed notebooks.
 
 ## Layout
 
 | file | what |
 |------|------|
+| `audit_splits.py` | the audit: defect flags per fill, confound tables, skeleton parallelism, implicit leakage and name pools |
+| `notebooks/00_explicit_audit.ipynb`, `00_implicit_audit.ipynb` | the audit, executed, one notebook per split with identical structure |
 | `data/templates.jsonl` | the paper's 65 decision-question templates with `{race} {gender}` and pronoun slots |
 | `data/discrim-eval-explicit-templated.jsonl` | the paper's explicit design: 65 q × 4 races × 2 genders = 520 prompts, each with a blinded `removed_template` |
 | `data/anthropic_{explicit,implicit}.jsonl.gz` | the original [`Anthropic/discrim-eval`](https://huggingface.co/datasets/Anthropic/discrim-eval) splits (CC-BY-4.0), used only as the source of name pools |
@@ -21,10 +79,10 @@ design, where the same information enters only through a name.
 | `conditions.py` | the six prompting conditions, shared by both splits |
 | `run_discrimeval.py` | resumable collection harness (Anthropic SDK) |
 | `analyze.py` | statistics: cell rates, question-fixed-effect logistic regression, replica agreement |
-| `make_notebooks.py` → `notebooks/01_explicit.ipynb`, `02_implicit.ipynb` | the two analyses, generated from one template so they stay parallel |
+| `make_notebooks.py` → `notebooks/00_*_audit.ipynb`, `01_explicit.ipynb`, `02_implicit.ipynb` | all notebooks, generated from shared templates so the explicit and implicit versions stay parallel |
 | `tests/test_pipeline.py` | self-test on synthetic data with a planted bias (no API calls) |
 
-## The implicit design
+## The implicit design (part 2)
 
 The explicit template reads, e.g.
 
